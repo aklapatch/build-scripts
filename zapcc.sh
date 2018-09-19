@@ -1,5 +1,0 @@
-git clone https://github.com/yrnkrn/zapcc.git llvm
-mkdir build
-cd build
-cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DLLVM_ENABLE_WARNINGS=OFF ../llvm
-ninja
