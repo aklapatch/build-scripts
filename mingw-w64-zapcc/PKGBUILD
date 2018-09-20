@@ -1,17 +1,20 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
-# Contributor: Mateusz Mikuła <mati865@gmail.com
+# Contributor: Mateusz Mikuła <mati865@gmail.com>
+# Contributor: Aaron Klapatch <klapatchaaron@gmail.com>
 
 _realname=zapcc
 pkgbase=mingw-w64-${_realname}-git
 pkgname="${MINGW_PACKAGE_PREFIX}-${_realname}-git"
-pkgver=9bd04e7
+pkgver=57.9bd04e761
 pkgrel=1
 pkgdesc="a caching C++ compiler based on clang, designed to perform faster compilations"
 arch=('x86_64')
 url="https://www.zapcc.com/"
 license=('NCSA')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc
+		${MINGW_PACKAGE_PREFIX}-clang
+		${MINGW_PACKAGE_PREFIX}-llvm")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -23,14 +26,13 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "tar"
              "groff")
 options=('!debug' 'strip')
-#source=("")
+source=("git+https://github.com/yrnkrn/zapcc.git")
 
-#sha256sums=('SKIP')
+sha256sums=('SKIP')
 
-prepare() {
-	cd ${srcdir}
-	[ -d "${srcdir}/zapcc" ] || git clone --depth=1 https://github.com/yrnkrn/zapcc.git zapcc
-	
+pkgver() {
+  cd "${srcdir}"/${_realname}
+  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {
@@ -38,12 +40,12 @@ build() {
 	[[ -d "${srcdir}/build-${MINGW_CHOST}" ]] && rm -rf "${srcdir}/build-${MINGW_CHOST}"
 	mkdir -p "${srcdir}/build-${MINGW_CHOST}" && cd "${srcdir}/build-${MINGW_CHOST}"
 	
-	cmake -G Ninja \
+	cmake -G 'MSYS Makefiles' \
 	 -DCMAKE_BUILD_TYPE=Release \
 	 -DLLVM_ENABLE_WARNINGS=OFF \
-	 -DCMAKE_INSTALL_PREFIX="$pkgdir"  \
+	 -DCMAKE_INSTALL_PREFIX="${pkgdir}${MINGW_PREFIX}"  \
 	 -DLLVM_DEFAULT_TARGET_TRIPLE=$CARCH-pc-windows-gnu  \
-	 ../zapcc
+	 ../${_realname}
 
 	ninja
 }
@@ -55,5 +57,5 @@ build() {
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  ninja install 
+  ninja install
 }
