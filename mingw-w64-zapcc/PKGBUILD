@@ -1,7 +1,6 @@
 # Maintainer: Alexey Pavlov <alexpux@gmail.com>
 # Contributor: Zion Nimchuk <zionnimchuk@gmail.com>
-# Contributor: Mateusz Mikuła <mati865@gmail.com>
-# Contributor: Aaron Klapatch <klapatchaaron@gmail.com>
+# Contributor: Mateusz Mikuła <mati865@gmail.com
 
 _realname=zapcc
 pkgbase=mingw-w64-${_realname}-git
@@ -12,9 +11,7 @@ pkgdesc="a caching C++ compiler based on clang, designed to perform faster compi
 arch=('x86_64')
 url="https://www.zapcc.com/"
 license=('NCSA')
-depends=("${MINGW_PACKAGE_PREFIX}-gcc
-		${MINGW_PACKAGE_PREFIX}-clang
-		${MINGW_PACKAGE_PREFIX}-llvm")
+depends=("${MINGW_PACKAGE_PREFIX}-gcc")
 makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-z3"
              "${MINGW_PACKAGE_PREFIX}-libffi"
@@ -22,17 +19,17 @@ makedepends=("${MINGW_PACKAGE_PREFIX}-cmake>=3.4.3"
              "${MINGW_PACKAGE_PREFIX}-python3-sphinx"
              "${MINGW_PACKAGE_PREFIX}-python2"
              "${MINGW_PACKAGE_PREFIX}-swig"
-			 "${MINGW_PACKAGE_PREFIX}-ninja"
-             "tar"
-             "groff")
+             'tar'
+             'groff'
+			 'git')
 options=('!debug' 'strip')
 source=("git+https://github.com/yrnkrn/zapcc.git")
 
 sha256sums=('SKIP')
 
 pkgver() {
-  cd "${srcdir}"/${_realname}
-  printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+	cd "${srcdir}"/${_realname}
+	printf "%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {
@@ -43,19 +40,14 @@ build() {
 	cmake -G 'MSYS Makefiles' \
 	 -DCMAKE_BUILD_TYPE=Release \
 	 -DLLVM_ENABLE_WARNINGS=OFF \
-	 -DCMAKE_INSTALL_PREFIX="${pkgdir}${MINGW_PREFIX}"  \
+	 -DCMAKE_INSTALL_PREFIX="${MINGW_PREFIX}"  \
 	 -DLLVM_DEFAULT_TARGET_TRIPLE=$CARCH-pc-windows-gnu  \
 	 ../${_realname}
 
-	ninja
+	 make --quiet
 }
-
-#check() {
-#	cd "${srcdir}/build-${MINGW_CHOST}"
-#	ninja check-all || true
-#}
 
 package() {
   cd "${srcdir}/build-${MINGW_CHOST}"
-  ninja install
+  make DESTDIR="${pkgdir}" install
 }
