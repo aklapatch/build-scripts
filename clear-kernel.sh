@@ -17,7 +17,6 @@ kfoldername="linux-$ver"
 kpackname="$kfoldername.tar.xz"
 wget -nc "https://cdn.kernel.org/pub/linux/kernel/v4.x/$kpackname"
 
-# extract files
 if [ ! -d "$foldername" ]; then
 	tar -xf "$packname"
 	tar -xf "$kpackname"
