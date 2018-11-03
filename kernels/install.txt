@@ -1,0 +1,13 @@
+
+#==> dkms install broadcom-wl/6.30.223.271 -k 4.18.16-2-MANJARO
+#==> Building image from preset: /etc/mkinitcpio.d/linux418.preset: 'default'
+#-> -k /boot/vmlinuz-4.18-x86_64 -c /etc/mkinitcpio.conf -g /boot/initramfs-4.18-x86_64.img
+#==> Building image from preset: /etc/mkinitcpio.d/linux418.preset: 'fallback'
+#-> -k /boot/vmlinuz-4.18-x86_64 -c /etc/mkinitcpio.conf -g /boot/initramfs-4.18-x86_64-fallback.img -S autodetect
+dkms install broadcom-wl/6.30.223.271 -k 4.18.16-2-MANJARO
+
+mkinitcpio -k /boot/vmlinuz-4.18-x86_64 -c /etc/mkinitcpio.conf -g /boot/initramfs-4.18-x86_64.img
+
+mkinitcpio -k /boot/vmlinuz-4.18-x86_64 -c /etc/mkinitcpio.conf -g /boot/initramfs-4.18-x86_64-fallback.img -S autodetect
+
+sudo grub-mkconfig -o /boot/grub/grub.cfg
