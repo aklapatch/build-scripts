@@ -30,6 +30,9 @@ fi
 
 cd "$kfoldername"
 
+cp ../$foldername/config config
+cp ../$foldername/config.fragment config.fragment
+
 # apply patches
 for ptch in ../$foldername/*.patch;
 do
