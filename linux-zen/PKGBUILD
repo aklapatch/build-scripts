@@ -86,6 +86,7 @@ source=(
 prepare() {
     cd ${_srcname}
 
+	## right now the config remove debugging options and the NUMA scheduling
    ### Setting config
         msg2 "Setting config..."
         cp -Tf $srcdir/../config ./.config
