@@ -60,11 +60,11 @@ _rev_override="n"
 
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
-pkgbase=linux-zen
+pkgbase=linux-zen-cust
 _major=4.19
-_minor=4
+_minor=8
 pkgver=${_major}.${_minor}
-_srcname=zen-kernel-${pkgver}-zen1
+_srcname=zen-kernel-${pkgver}-zen2
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/zen-kernel"
@@ -73,22 +73,21 @@ makedepends=('bc' 'git' 'inetutils' 'kmod' 'libelf' 'linux-firmware' 'xmlto')
 options=('!strip')
 _gcc_more_v='20180509'
 source=(
-  "https://github.com/zen-kernel/zen-kernel/archive/v${pkgver}-zen1.tar.gz"
+  "https://github.com/zen-kernel/zen-kernel/archive/v${pkgver}-zen2.tar.gz"
   'https://downloadmirror.intel.com/28039/eng/microcode-20180807.tgz'
   '60-linux.hook'  # pacman hook for depmod
   '90-linux.hook'  # pacman hook for initramfs regeneration
   '99-linux.hook'  # pacman hook for remove initramfs
   'linux.preset'   # standard config files for mkinitcpio ramdisk
-  'config'  # config derived from manjaro
+  't-config'  # config derived from arch
 )
 
 prepare() {
     cd ${_srcname}
 
-	## right now the config remove debugging options and the NUMA scheduling
    ### Setting config
         msg2 "Setting config..."
-        cp -Tf $srcdir/../config ./.config
+        cp -Tf $srcdir/t-config ./.config
         make olddefconfig
 
     ### Copying i915 firmware and intel-ucode
@@ -222,7 +221,7 @@ _package() {
 
 _package-headers() {
     pkgdesc="Header files and scripts for building modules for linux-zen"
-    depends=('linux-zen')
+    depends=('linux-zen-cust')
 
     local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
 
