@@ -62,9 +62,9 @@ _rev_override="n"
 
 pkgbase=linux-zen-cust
 _major=4.19
-_minor=8
+_minor=11
 pkgver=${_major}.${_minor}
-_srcname=zen-kernel-${pkgver}-zen2
+_srcname=zen-kernel-${pkgver}-zen1
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/zen-kernel"
@@ -73,7 +73,7 @@ makedepends=('bc' 'git' 'inetutils' 'kmod' 'libelf' 'linux-firmware' 'xmlto')
 options=('!strip')
 _gcc_more_v='20180509'
 source=(
-  "https://github.com/zen-kernel/zen-kernel/archive/v${pkgver}-zen2.tar.gz"
+  "https://github.com/zen-kernel/zen-kernel/archive/v${pkgver}-zen1.tar.gz"
   'https://downloadmirror.intel.com/28039/eng/microcode-20180807.tgz'
   '60-linux.hook'  # pacman hook for depmod
   '90-linux.hook'  # pacman hook for initramfs regeneration
@@ -111,13 +111,6 @@ prepare() {
         # https://bugs.archlinux.org/task/55880
         msg2 "Enabling crypto_user module..."
         sed -i "s|# CONFIG_CRYPTO_USER is not set|CONFIG_CRYPTO_USER=m|g" ./.config
-
-    ### Compress modules
-        msg "Enabling XZ compressed modules..."
-        sed -i 's|^# CONFIG_MODULE_COMPRESS|\
-CONFIG_MODULE_COMPRESS=y\
-# CONFIG_MODULE_COMPRESS_GZIP is not set\
-CONFIG_MODULE_COMPRESS_XZ=y|' ./.config
 
     ### Patch source to unlock additional gcc CPU optimizations
         # https://github.com/graysky2/kernel_gcc_patch
