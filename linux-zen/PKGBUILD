@@ -61,10 +61,11 @@ _rev_override="n"
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 pkgbase=linux-zen-cust
-_major=4.19
-_minor=11
+_major=4.20
+_minor=3
+_zenver=1
 pkgver=${_major}.${_minor}
-_srcname=zen-kernel-${pkgver}-zen1
+_srcname=zen-kernel-${pkgver}-zen${_zenver}
 pkgrel=1
 arch=('x86_64')
 url="https://github.com/zen-kernel"
@@ -79,7 +80,7 @@ source=(
   '90-linux.hook'  # pacman hook for initramfs regeneration
   '99-linux.hook'  # pacman hook for remove initramfs
   'linux.preset'   # standard config files for mkinitcpio ramdisk
-  't-config'  # config derived from arch
+  'config'  # config derived from clear linux
 )
 
 prepare() {
@@ -87,7 +88,7 @@ prepare() {
 
    ### Setting config
         msg2 "Setting config..."
-        cp -Tf $srcdir/t-config ./.config
+        cp -Tf $srcdir/config ./.config
         make olddefconfig
 
     ### Copying i915 firmware and intel-ucode
@@ -96,6 +97,12 @@ prepare() {
         cp -a ${srcdir}/intel-ucode firmware/
         cp  ${srcdir}/intel-ucode-with-caveats/06* firmware/intel-ucode/
         rm -f firmware/intel-ucode/0f*
+
+        msg "Enabling XZ compressed modules..."
+        sed -i 's|^# CONFIG_MODULE_COMPRESS|\
+CONFIG_MODULE_COMPRESS=y\
+# CONFIG_MODULE_COMPRESS_GZIP is not set\
+CONFIG_MODULE_COMPRESS_XZ=y|' ./.config
 
     ### Prepared version
         make -s kernelrelease > ../version
@@ -112,19 +119,8 @@ prepare() {
         msg2 "Enabling crypto_user module..."
         sed -i "s|# CONFIG_CRYPTO_USER is not set|CONFIG_CRYPTO_USER=m|g" ./.config
 
-    ### Patch source to unlock additional gcc CPU optimizations
-        # https://github.com/graysky2/kernel_gcc_patch
-		#if [ "${_enable_gcc_more_v}" = "y" ]; then
-		#msg2 "Enabling additional gcc CPU optimizations..."
-		#patch -Np1 -i "$srcdir/kernel_gcc_patch-$_gcc_more_v/enable_additional_cpu_optimizations_for_gcc_v8.1+_kernel_v4.13+.patch"
-		#fi
-
-    ### Get kernel version
-        if [ "${_enable_gcc_more_v}" = "y" ] || [ -n "${_subarch}" ]; then
-        yes "$_subarch" | make oldconfig
-        else
-        make prepare
-        fi
+	# select optimizations
+	make prepare
 
     ### Optionally load needed modules for the make localmodconfig
         # See https://aur.archlinux.org/packages/modprobed-db
