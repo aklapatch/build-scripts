@@ -65,12 +65,10 @@ _rev_override="n"
 ### IMPORTANT: Do no edit below this line unless you know what you're doing
 
 _major=4.20
-_minor=2
-_ckpatchversion=1
-_ckpatch="patch-4.20-ck${_ckpatchversion}"
+_minor=3
 _srcname=linux-${_major}
-_clr=${_major}.2-682
-pkgbase=linux-cust
+_clr=${_major}.${}-683
+pkgbase=linux-clear-cust
 pkgver=${_major}.${_minor}
 pkgrel=1
 arch=('x86_64')
@@ -90,7 +88,7 @@ source=(
   '90-linux.hook'  # pacman hook for initramfs regeneration
   '99-linux.hook'  # pacman hook for remove initramfs
   'linux.preset'   # standard config files for mkinitcpio ramdisk
-  'config' # altered config to enable some modules (BCM-wl and dell bios backend)
+  'config' # altered config to disable module signature checking
 )
 
 _kernelname=${pkgbase#linux}
@@ -128,11 +126,11 @@ prepare() {
         rm -f firmware/intel-ucode/0f*
 
 		### Compress modules
-        msg "Enabling XZ compressed modules..."
-        sed -i 's|^# CONFIG_MODULE_COMPRESS|\
-CONFIG_MODULE_COMPRESS=y\
-# CONFIG_MODULE_COMPRESS_GZIP is not set\
-CONFIG_MODULE_COMPRESS_XZ=y|' ./.config
+#        msg "Enabling XZ compressed modules..."
+#        sed -i 's|^# CONFIG_MODULE_COMPRESS|\
+#CONFIG_MODULE_COMPRESS=y\
+## CONFIG_MODULE_COMPRESS_GZIP is not set\
+#CONFIG_MODULE_COMPRESS_XZ=y|' ./.config
 
     ### Prepared version
         make -s kernelrelease > ../version
@@ -249,7 +247,7 @@ _package() {
 
 _package-headers() {
     pkgdesc="Header files and scripts for building modules for linux-clear"
-    depends=('linux-cust')
+    depends=('linux-clear-cust')
 
     local builddir="$pkgdir/usr/lib/modules/$(<version)/build"
 
@@ -339,7 +337,7 @@ done
 
 sha256sums=('ad0823183522e743972382df0aa08fb5ae3077f662b125f1e599b0b2aaa12438'
             'SKIP'
-            '5b4fc9453182f74f28cda6e9c59a2b71f61ac862cbe30f67c8d225d72f1fdf10'
+            'SKIP'
             'SKIP'
             '29f9e8dc27e6c9b6488cecd7fe2394030307799e511db2d197d9e6553a7f9e40'
             '226e30068ea0fecdb22f337391385701996bfbdba37cdcf0f1dbf55f1080542d'
