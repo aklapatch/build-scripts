@@ -62,8 +62,8 @@ _rev_override="n"
 
 pkgbase=linux-zen-clear-cust
 _major=4.20
-_minor=3
-_zenver=2
+_minor=5
+_zenver=1
 pkgver=${_major}.${_minor}
 _srcname=zen-kernel-${pkgver}-zen${_zenver}
 pkgrel=1
@@ -81,7 +81,7 @@ source=(
   '90-linux.hook'  # pacman hook for initramfs regeneration
   '99-linux.hook'  # pacman hook for remove initramfs
   'linux.preset'   # standard config files for mkinitcpio ramdisk
-  'config'  # config derived from clear linux
+  'config'  # config derived from clear linux ( removed need for kernel module authentication)
 )
 
 prepare() {
@@ -121,13 +121,11 @@ prepare() {
         sed -i "s|# CONFIG_CRYPTO_USER is not set|CONFIG_CRYPTO_USER=m|g" ./.config
         
     ## add clearlinux patches    
+    # 
     for i in $(grep '^Patch' ${srcdir}/linux/linux.spec | grep -Ev '^Patch0501|^Patch0124' | sed -n 's/.*: //p'); do
 		msg2 "Applying patch ${i}..."
         patch -Np1 -i "$srcdir/linux/${i}"
     done
-
-	# select optimizations
-	make prepare
 
     ### Optionally load needed modules for the make localmodconfig
         # See https://aur.archlinux.org/packages/modprobed-db
@@ -146,15 +144,22 @@ prepare() {
     ### Running make nconfig
 
         [[ -z "$_makenconfig" ]] || make nconfig
+        
+        
+        # prevent config errors
+        make olddefconfig
+		make prepare
 
     ### Save configuration for later reuse
 
         cp -Tf ./.config "${startdir}/config-${pkgver}-${pkgrel}${_kernelname}"
+        
+        
 }
 
 build() {
     cd ${_srcname}
-
+    
     make bzImage modules
 }
 
